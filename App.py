@@ -20,14 +20,15 @@ from langchain.docstore.document import Document
 # In[ ]:
 
 
-load_dotenv(find_dotenv(), override=True)
+#load_dotenv(find_dotenv(), override=True)
+api_key="sk-proj-IYP3uNpGeC8Xq9I5ein6T3BlbkFJCT0bfEE2zKFxE9qCTlAU"
 
 
 # In[ ]:
 
 
 def crear_resumen(txt):
-    llm = ChatOpenAI(temperature=0.5, model_name='gpt-4')
+    llm = ChatOpenAI(temperature=0.5, model_name='gpt-4', openai_api_key=api_key)
     
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=20000, chunk_overlap=500)
     chunks=text_splitter.create_documents([texto])
