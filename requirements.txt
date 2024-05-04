@@ -1,4 +1,4 @@
 streamlit
 langchain
 tiktoken
-dotenv
+python-dotenv
