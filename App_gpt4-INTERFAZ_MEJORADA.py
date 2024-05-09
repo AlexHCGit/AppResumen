@@ -88,7 +88,7 @@ st.title('App Resumen Texto (modelo GPT 4)')
 
 if st.button('Opciones Avanzadas'):
     # Muestra un control deslizante
-    valor_temperatura = st.slider('Selecciona Creatividad (0 Nula, 2 Creativo)', 0, 2, 0.1)
+    valor_temperatura = st.slider('Selecciona Creatividad (0 Nula, 2 Creativo)', 0.0, 2.0, 0.1)
     st.write(f'Has seleccionado: {valor_temperatura}')
     
         
