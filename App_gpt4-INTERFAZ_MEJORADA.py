@@ -103,7 +103,7 @@ result=[]
 with st.form('summarize_form', clear_on_submit=True): 
 # Pedimos la clave API de openAI, cuando se haya ingresado un texto
     openai_api_key = st.text_input('OpenAI API Key', type = 'password', disabled=not texto) 
-    submitted = st.form_submit_button('Submit') # Creamos un boton 'Submit' para que el usuario enví el formulario
+    submitted = st.form_submit_button('Resunir') # Creamos un boton 'Resumir' para que el usuario enví el formulario
     if submitted and openai_api_key.startswith('sk-'): # Comprobamos si se ha dado a 'Submit' y si la clave es correcta.
         with st.spinner('Resumiendo...'): # Se genera un mensaje de 'Resumiendo...' mientras se realiza la tarea
             resumen = crear_resumen(texto) # Llamamos a la función para realizar el resumen
