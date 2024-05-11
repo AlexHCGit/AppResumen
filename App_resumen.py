@@ -20,8 +20,10 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 # In[3]:
 
 
-# Definimos una función para la realización del resumen del texto que tengamos.
-# Utilizaré el modelo gpt-4 para ChatOpenAi de la libreríra langchain.
+# Definimos una función para la realización del resumen del texto que tengamos con el método map_reduce y otra con el método
+# 'refine' para ejecutar una u otra en función de la selección del usuario.
+
+# Utilizaré el modelo para ChatOpenAi de la libreríra langchain, que elliga el usuario entre 'gpt-4' y 'gpt-3.5-turbo'.
 
 def crear_resumen_mapreduce(txt, temp, modelo):
 
@@ -89,8 +91,9 @@ def crear_resumen_refine(txt, temp, modelo):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=20000, chunk_overlap=500)
     chunks=text_splitter.create_documents([txt])
     
-    # Como vamos a utilizar el métod map_reduce, definimos un prompt_template para las primeras particiones del texto
-    # al cual se les hará un resumen; y otro template para resumir la combinación de los resumenes anteriores.
+    # Como vamos a utilizar el métod refine, definimos un prompt_template para la primera partición del texto
+    # al cual se les hará un resumen; y otro template para resumir el siguiente chunk añadido al primer resumen,
+    # y así hasta el final.
     
     # Le indicamos cómo queremos que haga el resumen:
     prompt_template='''
@@ -104,18 +107,18 @@ def crear_resumen_refine(txt, temp, modelo):
         template=prompt_template
     )
     
-    # En este prompt le damos más detalles de cómo queremos que dé formato el resumen final, con una título, apartados
-    # con "bullet points" y una conclusión.
+    # En este prompt le damos más detalles de cómo queremos que dé formato el resumen.
+    # con Título, Introducción, "bullet points" y una conclusión.
     
     refine_template='''
-    Escriba un resumen final.
+    Escriba un resumen final. 
     He proporcinado un resumen existente hasta cierto punto: {existing_answer}.
     Perfecciona el resumen existente con algo más de contexto a continuación.
     -------------
     {text}
     -------------
-    Comience el resumen final con una "Introdiucción" que nos de una visión general del tema seguido por los puntos
-    más relevantes ("Bullet Points"). Termina el resumen con una conclusión.
+    Comience el resumen final con un "Título" y una "Introducción" que nos de una visión general del tema seguido por los puntos
+    más relevantes con "Bullet Points". Termina el resumen con una conclusión.
     '''
     refine_prompt= PromptTemplate(
         input_variables=['existing_answer', 'text'],
@@ -123,8 +126,9 @@ def crear_resumen_refine(txt, temp, modelo):
     )
     
     # En este momento realizamos la cadena resumen, para ello utilizamos el LLM configurado anteriormente con ChatOpenAI,
-    # con el método map_reduce, donde primero se generan resumenes de los fragmentos con la plantilla 'map_prompt_template',
-    # y leugo se hace un resumen final a partir de estos con la plantilla 'prompot_template_combinado'
+    # con el método refine, donde primero se hace un resumen del primer fragemnto 'prompt_inicial',
+    # y leugo se hace un resumen de cada uno de los restantes chunks añadiendo el resumen anterior,
+    # con la plantilla 'refine_prompt'
     
     cadena_resumen = load_summarize_chain(
         llm=llm,
@@ -137,9 +141,6 @@ def crear_resumen_refine(txt, temp, modelo):
     return cadena_resumen.run(chunks)
 
 
-
-
-
 #####    STREAMLIT  ########
 
 # Vamos a definir la apariencia de nuestra app en streamlit:
@@ -148,21 +149,17 @@ def crear_resumen_refine(txt, temp, modelo):
 st.set_page_config(page_title='App Resumen Texto')
 st.title('App Resumen Texto')
 
-# Creamos un botón de usuario avanzado:
+# Creamos en una barra lateral selectores de diferentes opciones
+st.sidebar.title('Opciones:')
 
-#if st.button('Opciones Avanzadas'):
-#    # Muestra un control deslizante
-#    valor_temperatura = st.slider('Selecciona Creatividad (0 Nula, 2 Creativo)', 0.0, 2.0, 0.1)
-#   st.write(f'Has seleccionado: {valor_temperatura}')
-#    seleccion = st.selectbox('Seleccione método:', ['map_reduce', 'refine'])
-    
-#else:
-#    valor_temperatura = 0.5
-#    seleccion = 'map_reduce'
+# La temperatura de "creativisdad"
+valor_temperatura = st.sidebar.slider('Selecciona Creatividad (0 Nula, 1 Creativo)', 0.0, 1.0, 0.5)
 
-valor_temperatura = st.slider('Selecciona Creatividad (0 Nula, 1 Creativo)', 0.0, 1.0, 0.5)
-seleccion = st.selectbox('Seleccione método:', ['map_reduce', 'refine'])
-modelo = st.radio('Elige un modelo:', options=('gpt-4', 'gpt-3.5-turbo'))
+# El método para resumir los chunks
+seleccion = st.sidebar.selectbox('Seleccione método:', ['map_reduce', 'refine'])
+
+# El modelo para LLM
+modelo = st.sidebar.radio('Elige un modelo:', options=('gpt-4', 'gpt-3.5-turbo'))
 
 
         
@@ -180,9 +177,7 @@ with st.form('summarize_form', clear_on_submit=True):
     submitted = st.form_submit_button('Submit') # Creamos un boton 'Submit' para que el usuario enví el formulario
     if submitted and openai_api_key.startswith('sk-'): # Comprobamos si se ha dado a 'Submit' y si la clave es correcta.
         with st.spinner('Resumiendo...'): # Se genera un mensaje de 'Resumiendo...' mientras se realiza la tarea
-            
-            
-            
+                                 
             if seleccion == 'map_reduce':
                 resumen = crear_resumen_mapreduce(texto, valor_temperatura, modelo) # Llamamos a la función para realizar el resumen
                 result.append(resumen) # Añadimos el resumen a una lista
