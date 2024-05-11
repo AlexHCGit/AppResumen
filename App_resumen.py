@@ -160,9 +160,9 @@ st.title('App Resumen Texto')
 #    valor_temperatura = 0.5
 #    seleccion = 'map_reduce'
 
-valor_temperatura = st.slider('Selecciona Creatividad (0:Nula, 1:Creativo)', 0.0, 1.0, 0.5)
+valor_temperatura = st.slider('Selecciona Creatividad (0 Nula, 1 Creativo)', 0.0, 1.0, 0.5)
 seleccion = st.selectbox('Seleccione método:', ['map_reduce', 'refine'])
-modelo = st.radio('Elige un modelo:', optinos=('gpt-4', 'gpt-3.5-turbo'))
+modelo = st.radio('Elige un modelo:', options=('gpt-4', 'gpt-3.5-turbo'))
 
 
         
