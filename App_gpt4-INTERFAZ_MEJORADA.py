@@ -182,7 +182,7 @@ with st.form('summarize_form', clear_on_submit=True):
             
             
             if seleccion == 'map_reduce':
-                resumen = crear_resumen_mapreduce(texto, valor_tempertura) # Llamamos a la función para realizar el resumen
+                resumen = crear_resumen_mapreduce(texto, valor_temperatura) # Llamamos a la función para realizar el resumen
                 result.append(resumen) # Añadimos el resumen a una lista
             if seleccion == 'refine':
                 resumen = crear_resumen_refine(texto, valor_temperatura)
