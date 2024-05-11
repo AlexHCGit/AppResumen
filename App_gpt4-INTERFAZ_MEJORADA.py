@@ -160,6 +160,8 @@ st.title('App Resumen Texto (modelo GPT 4)')
 #    valor_temperatura = 0.5
 #    seleccion = 'map_reduce'
 
+valor_temperatura = st.slider('Selecciona Creatividad (0 Nula, 2 Creativo)', 0.0, 2.0, 0.1)
+seleccion = st.selectbox('Seleccione método:', ['map_reduce', 'refine'])
 
         
 # Introducción Texto en un área creada a tal efecto
@@ -177,8 +179,7 @@ with st.form('summarize_form', clear_on_submit=True):
     if submitted and openai_api_key.startswith('sk-'): # Comprobamos si se ha dado a 'Submit' y si la clave es correcta.
         with st.spinner('Resumiendo...'): # Se genera un mensaje de 'Resumiendo...' mientras se realiza la tarea
             
-            valor_temperatura = st.slider('Selecciona Creatividad (0 Nula, 2 Creativo)', 0.0, 2.0, 0.1)
-            seleccion = st.selectbox('Seleccione método:', ['map_reduce', 'refine'])
+            
             
             if seleccion == 'map_reduce':
                 resumen = crear_resumen_mapreduce(texto, valor_tempertura) # Llamamos a la función para realizar el resumen
