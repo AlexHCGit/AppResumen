@@ -3,3 +3,4 @@ langchain
 tiktoken
 python-dotenv
 openai
+langchain_community
